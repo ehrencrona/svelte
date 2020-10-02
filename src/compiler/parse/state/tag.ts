@@ -223,14 +223,21 @@ export default function tag(parser: Parser) {
 		);
 		parser.read(/<\/textarea>/);
 		element.end = parser.index;
-	} else if (name === 'script' || name === 'style') {
+	} else if (name === 'script') {
 		// special case
 		const start = parser.index;
-		const data = parser.read_until(new RegExp(`<\\/${name}>`));
+		const data = parser.read_until(/<\/script>/);
 		const end = parser.index;
 		element.children.push({ start, end, type: 'Text', data });
-		parser.eat(`</${name}>`, true);
+		parser.eat('</script>', true);
 		element.end = parser.index;
+	} else if (name === 'style') {
+		// special case
+		const start = parser.index;
+		const data = parser.read_until(/<\/style>/);
+		const end = parser.index;
+		element.children.push({ start, end, type: 'Text', data });
+		parser.eat('</style>', true);
 	} else {
 		parser.stack.push(element);
 	}
